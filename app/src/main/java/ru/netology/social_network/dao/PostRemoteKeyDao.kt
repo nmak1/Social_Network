@@ -1,11 +1,8 @@
 package ru.netology.social_network.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
+import androidx.room.*
 import androidx.room.OnConflictStrategy.Companion.REPLACE
-import androidx.room.Query
 import ru.netology.social_network.entity.PostRemoteKeyEntity
-
 
 @Dao
 interface PostRemoteKeyDao {
@@ -19,12 +16,12 @@ interface PostRemoteKeyDao {
     @Query("SELECT MIN(`key`) FROM PostRemoteKeyEntity")
     suspend fun min(): Long?
 
+    @Query("DELETE FROM PostRemoteKeyEntity")
+    suspend fun removeAll()
+
     @Insert(onConflict = REPLACE)
     suspend fun insert(postRemoteKeyEntity: PostRemoteKeyEntity)
 
     @Insert(onConflict = REPLACE)
     suspend fun insert(postRemoteKeyEntity: List<PostRemoteKeyEntity>)
-
-    @Query("DELETE FROM PostRemoteKeyEntity")
-    suspend fun clear()
 }

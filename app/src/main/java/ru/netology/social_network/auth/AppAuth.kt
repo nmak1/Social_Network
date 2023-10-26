@@ -1,6 +1,5 @@
 package ru.netology.social_network.auth
 
-import android.annotation.SuppressLint
 import android.content.Context
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
@@ -16,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import ru.netology.social_network.api.ApiService
+import ru.netology.social_network.api.UserApiService
 import ru.netology.social_network.dto.PushToken
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,9 +30,7 @@ class AppAuth @Inject constructor(
     private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     private val idKey = "id"
     private val tokenKey = "token"
-
     private val _authStateFlow: MutableStateFlow<AuthState>
-
 
     init {
         val id = prefs.getLong(idKey, 0)
@@ -48,11 +45,9 @@ class AppAuth @Inject constructor(
         } else {
             _authStateFlow = MutableStateFlow(AuthState(id, token))
         }
-        sendPushToken()
     }
 
     val authStateFlow: StateFlow<AuthState> = _authStateFlow.asStateFlow()
-
 
     @Synchronized
     fun setAuth(id: Long, token: String) {
@@ -71,28 +66,30 @@ class AppAuth @Inject constructor(
             clear()
             commit()
         }
-        sendPushToken()
     }
 
     @InstallIn(SingletonComponent::class)
     @EntryPoint
     interface AppAuthEntryPoint {
-        fun getApiService(): ApiService
+        fun getUserApiService(): UserApiService
     }
 
-    @SuppressLint("SuspiciousIndentation")
     fun sendPushToken(token: String? = null) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
-                val pushToken = PushToken(token ?: Firebase.messaging.token.await())
+                val pushToken =
+                    PushToken(token ?: Firebase.messaging.token.await())
                 val entryPoint =
                     EntryPointAccessors.fromApplication(context, AppAuthEntryPoint::class.java)
-                entryPoint.getApiService().sendPushToken(pushToken)
+                entryPoint.getUserApiService().sendPushToken(pushToken)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
-
 }
-data class AuthState(val id: Long = 0, val token: String? = null)
+
+data class AuthState(
+    val id: Long = 0,
+    val token: String? = null,
+)

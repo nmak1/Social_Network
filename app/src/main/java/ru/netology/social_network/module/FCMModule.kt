@@ -1,5 +1,6 @@
 package ru.netology.social_network.module
 
+import com.google.android.gms.common.GoogleApiAvailabilityLight
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.Module
 import dagger.Provides
@@ -13,6 +14,10 @@ class FCMModule {
 
     @Singleton
     @Provides
-    fun provideFCMService(): FirebaseMessaging =
-        FirebaseMessaging.getInstance()
+    fun providesFirebaseMessaging(): FirebaseMessaging = FirebaseMessaging.getInstance()
+
+    @Singleton
+    @Provides
+    fun checkGoogleApiAvailability(): GoogleApiAvailabilityLight =
+        GoogleApiAvailabilityLight.getInstance()
 }

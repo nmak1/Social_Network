@@ -3,53 +3,65 @@ package ru.netology.social_network.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import ru.netology.social_network.dto.Attachment
 import ru.netology.social_network.dto.Post
 
 @Entity
 data class PostEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
-    val author: String,
     val authorId: Long,
-    val published: String,
+    val author: String,
+    val authorAvatar: String?,
     val content: String,
-    val likeByMe: Boolean,
-    val likes: Int = 0,
-    val shares: Int = 0,
-    val views: Boolean = false,
-    val videoUrl: String? = null,
-    val authorAvatar: String? = null,
+    val published: String,
     @Embedded
-    val attachment: Attachment?,
+    val coordinates: CoordinatesEmbeddable?,
+    val link: String? = null,
+    val mentionIds: Set<Long> = emptySet(),
+    val mentionedMe: Boolean,
+    val likeOwnerIds: Set<Long> = emptySet(),
+    val likedByMe: Boolean,
+    @Embedded
+    val attachment: AttachmentEmbeddable?,
     val ownedByMe: Boolean,
 ) {
-    fun toDto() =
-        Post(
-            id, author, authorId, published, content, likeByMe, likes, shares, views, videoUrl, authorAvatar,attachment?.toDto(),
-            ownedByMe)
+    fun toDto() = Post(
+        id,
+        authorId,
+        author,
+        authorAvatar,
+        content,
+        published,
+        coordinates?.toDto(),
+        link,
+        mentionIds,
+        mentionedMe,
+        likeOwnerIds,
+        likedByMe,
+        attachment?.toDto(),
+        ownedByMe,
+    )
 
     companion object {
-        fun fromDto(dto: Post) = with(dto) {
+        fun fromDto(dto: Post) =
             PostEntity(
                 dto.id,
-                dto.author,
                 dto.authorId,
-                dto.published,
-                dto.content,
-                dto.likedByMe,
-                dto.likes,
-                dto.shares,
-                dto.views,
-                dto.videoUrl,
+                dto.author,
                 dto.authorAvatar,
-                Attachment.fromDto(dto.attachment),
-                dto.ownedByMe
+                dto.content,
+                dto.published,
+                CoordinatesEmbeddable.fromDto(dto.coordinates),
+                dto.link,
+                dto.mentionIds,
+                dto.mentionedMe,
+                dto.likeOwnerIds,
+                dto.likedByMe,
+                AttachmentEmbeddable.fromDto(dto.attachment),
+                dto.likedByMe,
             )
-        }
-
     }
 }
 
-fun List<PostEntity>.toDto() = map { it.toDto() }
-fun List<Post>.toEntity() = map { PostEntity.fromDto(it) }
+fun List<PostEntity>.toDto() = map(PostEntity::toDto)
+fun List<Post>.toPostEntity() = map(PostEntity::fromDto)

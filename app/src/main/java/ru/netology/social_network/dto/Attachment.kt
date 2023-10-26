@@ -1,19 +1,8 @@
 package ru.netology.social_network.dto
 
+import ru.netology.social_network.enumeration.AttachmentType
+
 data class Attachment(
     val url: String,
-    val type: TypeAttachment,
-) {
-    fun toDto() = Attachment(url, type)
-
-    companion object {
-        fun fromDto(dto: Attachment?) = dto?.let {
-            Attachment(it.url, it.type)
-        }
-
-    }
-}
-
-enum class TypeAttachment {
-    IMAGE
-}
+    val type: AttachmentType,
+)

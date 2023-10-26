@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.AppTheme.LikeSumCheckBox" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconTint">@color/orange_200</item>
+        <item name="icon">@drawable/ic_baseline_favorite_16</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size_smallest</item>
+        <item name="android:minHeight">@dimen/button_size_smallest</item>
+    </style>
+
+    <style name="Widget.AppTheme.LikeCheckBox" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconTint">@animator/like_checkbox_tint</item>
+        <item name="icon">@drawable/like_selector</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:text">@string/like</item>
+        <item name="textAllCaps">false</item>
+        <item name="backgroundTint">@color/silver_light_background_tint</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size</item>
+        <item name="android:minHeight">@dimen/button_size</item>
+    </style>
+
+    <style name="Widget.AppTheme.MentionsSumCheckBox" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconTint">@color/orange_200</item>
+        <item name="icon">@drawable/ic_baseline_groups_16</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size_smallest</item>
+        <item name="android:minHeight">@dimen/button_size_smallest</item>
+    </style>
+
+    <style name="Widget.AppTheme.MentionCheckBox" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconTint">@color/gray_empty_icon</item>
+        <item name="icon">@drawable/ic_baseline_person_add_alt_24</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:text">@string/mention</item>
+        <item name="textAllCaps">false</item>
+        <item name="backgroundTint">@color/silver_light_background_tint</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size</item>
+        <item name="android:minHeight">@dimen/button_size</item>
+    </style>
+
+    <style name="Widget.AppTheme.ShareCheckBox" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconTint">@color/gray_empty_icon</item>
+        <item name="icon">@drawable/ic_baseline_share_24</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="backgroundTint">@color/silver_light_background_tint</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size</item>
+        <item name="android:minHeight">@dimen/button_size</item>
+    </style>
+
+    <style name="Widget.AppTheme.ParticipantsSumCheckBox" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconTint">@color/orange_200</item>
+        <item name="icon">@drawable/ic_baseline_supervised_user_circle_16</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size_smallest</item>
+        <item name="android:minHeight">@dimen/button_size_smallest</item>
+    </style>
+
+    <style name="Widget.AppTheme.ParticipateCheckBox" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconTint">@color/gray_empty_icon</item>
+        <item name="icon">@drawable/ic_outline_front_hand_24</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:text">@string/participate</item>
+        <item name="textAllCaps">false</item>
+        <item name="backgroundTint">@color/silver_light_background_tint</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size</item>
+        <item name="android:minHeight">@dimen/button_size</item>
+    </style>
+
+    <style name="Widget.AppTheme.SpeakersSumCheckBox" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconTint">@color/gray_empty_icon</item>
+        <item name="icon">@drawable/ic_baseline_record_voice_over_24</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:text">@string/speakers</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size_smallest</item>
+        <item name="android:minHeight">@dimen/button_size_smallest</item>
+    </style>
+
+    <style name="Widget.AppTheme.ViewCheckBox" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconTint">@color/gray_empty_icon</item>
+        <item name="icon">@drawable/ic_baseline_remove_red_eye_24</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size</item>
+        <item name="android:minHeight">@dimen/button_size</item>
+    </style>
+
+    <style name="Widget.App.MenuCheckBox" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="iconTint">@color/gray_empty_icon</item>
+        <item name="iconPadding">0dp</item>
+        <item name="icon">@drawable/ic_baseline_more_vert_24</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size_large</item>
+        <item name="android:minHeight">@dimen/button_size_large</item>
+    </style>
+
+    <style name="Widget.App.Play" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="iconTint">@animator/play_pause_checkbox_tint</item>
+        <item name="icon">@drawable/play_pause_selector</item>
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size_large</item>
+        <item name="android:minHeight">@dimen/button_size_large</item>
+    </style>
+
+    <style name="Widget.App.Location" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="iconTint">@color/gray_empty_icon</item>
+        <item name="icon">@drawable/ic_baseline_location_on_24</item>
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:minWidth">@dimen/button_size</item>
+        <item name="android:minHeight">@dimen/button_size</item>
+    </style>
+
+    <style name="Theme.Fab" parent="ShapeAppearanceOverlay.Material3.FloatingActionButton">
+        <item name="android:backgroundTint">@color/blue_700</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_margin">@dimen/common_spacing_large</item>
+    </style>
+
+    <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_dialog</item>
+    </style>
+
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxStrokeColor">#999999</item>
+        <item name="boxStrokeWidth">1dp</item>
+    </style>
+
+</resources>

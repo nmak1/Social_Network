@@ -7,168 +7,160 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import ru.netology.social_network.dto.FeedItem
+import ru.netology.social_network.auth.AppAuth
 import ru.netology.social_network.dto.MediaUpload
 import ru.netology.social_network.dto.Post
-import ru.netology.social_network.model.FeedModelState
-import ru.netology.social_network.model.PhotoModel
+import ru.netology.social_network.enumeration.AttachmentType
+import ru.netology.social_network.model.MediaModel
+import ru.netology.social_network.model.StateModel
 import ru.netology.social_network.repository.PostRepository
-import ru.netology.social_network.until.RetryTypes
-import ru.netology.social_network.until.SingleLiveEvent
-import java.io.File
+import ru.netology.social_network.untils.SingleLiveEvent
+import java.io.IOException
+import java.io.InputStream
 import javax.inject.Inject
 
-private val emptyPost = Post(
-
-    0,
-    "",
-    0,
-    "",
-    "",
-    false,
-    0,
-    0,
-    false,
-    "0",
-    "",
-    attachment = null
+private val empty = Post(
+    id = 0,
+    authorId = 0,
+    author = "",
+    authorAvatar = "",
+    content = "",
+    published = "2023-10-27T17:00:00.000Z",
+    mentionedMe = false,
+    likedByMe = false,
 )
 
+private val noMedia = MediaModel()
+
+@ExperimentalCoroutinesApi
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val repository: PostRepository,
+    private val postRepository: PostRepository,
+    appAuth: AppAuth,
 ) : ViewModel() {
-    private val cached = repository.data.cachedIn(viewModelScope)
 
-    val data: Flow<PagingData<FeedItem>> = cached
-    private val edited = MutableLiveData(emptyPost)
+    private val cached = postRepository
+        .data
+        .cachedIn(viewModelScope)
 
-    private val _state = MutableLiveData<FeedModelState>()
-    val state: LiveData<FeedModelState>
-        get() = _state
+    val data: Flow<PagingData<Post>> =
+        appAuth.authStateFlow
+            .flatMapLatest { (myId, _) ->
+                cached.map { pagingData ->
+                    pagingData.map { post ->
+                        post.copy(
+                            ownedByMe = post.authorId == myId,
+                            likedByMe = post.likeOwnerIds.contains(myId)
+                        )
+                    }
+                }
+            }
 
-//    val newerCount: LiveData<Int> = data.switchMap {
-//        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
-//            .asLiveData(Dispatchers.Default)
-//    }
+    val edited = MutableLiveData(empty)
+
+    private val _dataState = MutableLiveData<StateModel>()
+    val dataState: LiveData<StateModel>
+        get() = _dataState
 
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
+
+    private val _media = MutableLiveData(noMedia)
+    val media: LiveData<MediaModel>
+        get() = _media
+
     private val scope = MainScope()
 
-    private val withoutPhoto = PhotoModel()
-    private val _photo = MutableLiveData(withoutPhoto)
-    val photo: LiveData<PhotoModel>
-        get() = _photo
-
-    init {
-        loadPosts()
-    }
-
-    fun loadPosts() = viewModelScope.launch {
-        try {
-            _state.value = FeedModelState(loading = true)
-            repository.getNewPosts()
-            _state.value = FeedModelState()
-        } catch (e: Exception) {
-            _state.value = FeedModelState(error = true)
-        }
-    }
-
-
     fun save() {
-        edited.value?.let {
+        edited.value?.let { post ->
             viewModelScope.launch {
+                _dataState.postValue(StateModel(loading = true))
                 try {
-                    when (_photo.value) {
-                        withoutPhoto -> repository.save(it)
-                        else -> _photo.value?.file?.let { file ->
-                            repository.saveWithAttachment(it, MediaUpload(file))
-                        }
+                    when (_media.value) {
+                        noMedia ->
+                            postRepository.savePost(post)
+                        else ->
+                            _media.value?.inputStream?.let {
+                                MediaUpload(it)
+                            }?.let {
+                                postRepository.saveWithAttachment(post, it, _media.value?.type!!)
+                            }
                     }
-                    _state.value = FeedModelState()
+                    _dataState.value = StateModel()
+                    _postCreated.value = Unit
+                } catch (e: IOException) {
+                    _dataState.postValue(StateModel(error = true))
                 } catch (e: Exception) {
-                    _state.value = FeedModelState(error = true)
+                    throw UnknownError()
                 }
-                _postCreated.value = Unit
             }
         }
-        edited.value = emptyPost
-        _photo.value = withoutPhoto
+        edited.value = empty
+        _media.value = noMedia
     }
 
-
-    fun retrySave(post: Post?) {
-        viewModelScope.launch {
-            try {
-                if (post != null) {
-                    save()
-                    loadPosts()
-                }
-            } catch (e: Exception) {
-                _state.value =
-                    FeedModelState(error = true, retryType = RetryTypes.SAVE, retryPost = post)
+    fun changeContent(content: String) {
+        edited.value?.let {
+            val text = content.trim()
+            if (edited.value?.content != text) {
+                edited.value = edited.value?.copy(content = text)
             }
+        }
+    }
+
+    fun changeMedia(
+        uri: Uri?,
+        inputStream: InputStream?,
+        type: AttachmentType?,
+    ) {
+        _media.value = MediaModel(uri, inputStream, type)
+    }
+
+    fun removeById(id: Long) = viewModelScope.launch {
+        try {
+            postRepository.removeById(id)
+        } catch (e: Exception) {
+            _dataState.value = StateModel(error = true)
         }
     }
 
     fun edit(post: Post) {
         edited.value = post
     }
-    fun changePhoto(uri: Uri?, file: File?) {
-        _photo.value = if (uri != null && file != null) {
-            PhotoModel(uri, file)
-        } else {
-            null
-        }
-    }
-
-    fun changeContent(content: String) {
-        val text = content.trim()
-        if (edited.value?.content == text) {
-            return
-        }
-        edited.value = edited.value?.copy(content = text)
-    }
 
     fun likeById(id: Long) = viewModelScope.launch {
         try {
-            repository.likeById(id)
+            postRepository.likeById(id)
         } catch (e: Exception) {
-            _state.value = FeedModelState(error = true)
+            _dataState.value = StateModel(error = true)
         }
     }
 
     fun unlikeById(id: Long) = viewModelScope.launch {
         try {
-            repository.unlikeById(id)
+            postRepository.unlikeById(id)
         } catch (e: Exception) {
-            _state.value = FeedModelState(error = true, retryId = id)
+            _dataState.value = StateModel(error = true)
         }
     }
 
-
-    fun removeById(id: Long) = viewModelScope.launch {
-        try {
-            repository.removeById(id)
-        } catch (e: Exception) {
-            _state.value = FeedModelState(error = true, retryType = RetryTypes.REMOVE, retryId = id)
-        }
-    }
-
-    fun loadNewPosts() = viewModelScope.launch {
-        try {
-            _state.value = FeedModelState(loading = true)
-            repository.getNewPosts()
-            _state.value = FeedModelState()
-        } catch (e: Exception) {
-            _state.value = FeedModelState(error = true)
+    fun changeMentionIds(id: Long) {
+        edited.value?.let {
+            if (edited.value?.mentionIds?.contains(id) == false) {
+                edited.value = edited.value?.copy(
+                    mentionIds = it.mentionIds.plus(id)
+                )
+            }
         }
     }
 
@@ -177,11 +169,4 @@ class PostViewModel @Inject constructor(
         scope.cancel()
     }
 }
-
-
-
-
-
-
-
 

@@ -1,198 +1,145 @@
 package ru.netology.social_network.repository
 
 import androidx.paging.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import ru.netology.social_network.api.ApiService
+import okhttp3.RequestBody.Companion.toRequestBody
+import ru.netology.social_network.api.PostApiService
 import ru.netology.social_network.dao.PostDao
 import ru.netology.social_network.dao.PostRemoteKeyDao
 import ru.netology.social_network.db.AppDb
 import ru.netology.social_network.dto.*
 import ru.netology.social_network.entity.PostEntity
-import ru.netology.social_network.entity.toEntity
-import ru.netology.social_network.errors.ApiException
+import ru.netology.social_network.enumeration.AttachmentType
+import ru.netology.social_network.errors.ApiError
 import ru.netology.social_network.errors.AppError
-import ru.netology.social_network.errors.NetworkException
-import ru.netology.social_network.errors.UnknownException
+import ru.netology.social_network.errors.NetworkError
 import java.io.IOException
 import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.random.Random
 
-@Singleton
 class PostRepositoryImpl @Inject constructor(
-    private val dao: PostDao,
-    private val apiService: ApiService,
+    private val postDao: PostDao,
+    private val postApiService: PostApiService,
     postRemoteKeyDao: PostRemoteKeyDao,
     appDb: AppDb,
 ) : PostRepository {
 
     @OptIn(ExperimentalPagingApi::class)
-    override val data: Flow<PagingData<FeedItem>> = Pager(
+    override val data: Flow<PagingData<Post>> = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-        pagingSourceFactory = { dao.getPagingSource() },
+        pagingSourceFactory = { postDao.getPagingSource() },
         remoteMediator = PostRemoteMediator(
-            apiService = apiService,
-            postDao = dao,
-            postRemoteKeyDao = postRemoteKeyDao,
-            appDb = appDb,
+            postDao,
+            postApiService,
+            postRemoteKeyDao,
+            appDb,
         )
     ).flow
         .map {
             it.map(PostEntity::toDto)
-                .insertSeparators { previous, _ ->
-                    if (previous?.id?.rem(5) == 0L) {
-                        Ad(Random.nextLong(), "figma.jpg")
-                    } else {
-                        null
-                    }
-                }
         }
 
-    override suspend fun getAll() {
+    override suspend fun savePost(post: Post) {
         try {
-            dao.getAll()
-            val response = apiService.getAll()
+            val response = postApiService.savePost(post)
             if (!response.isSuccessful) {
-                throw ApiException(response.code(), response.message())
+                throw ApiError(response.message())
             }
-            val body = response.body() ?: throw ApiException(response.code(), response.message())
-            dao.insert(body.toEntity().map {
-                it.copy(views = true)
-            })
+            val body = response.body() ?: throw ApiError(response.message())
+            postDao.insertPost(PostEntity.fromDto(body))
         } catch (e: IOException) {
-            throw NetworkException
+            throw NetworkError
         } catch (e: Exception) {
-            throw UnknownException
+            e.printStackTrace()
         }
     }
 
-    override fun getNewerCount(firstId: Long): Flow<Int> = flow {
-        while (true) {
-            delay(10_000L)
-            val response = apiService.getNewer(firstId)
-            if (!response.isSuccessful) {
-                throw ApiException(response.code(), response.message())
-            }
-            val body =
-                response.body() ?: throw ApiException(response.code(), response.message())
-            dao.insertInvisible(body.toEntity().map {
-                it.copy(views = false)
-            })
-            emit(body.size)
-
-        }
-    }
-        .catch { e -> throw AppError.from(e) }
-        .flowOn(Dispatchers.Default)
-
-    override suspend fun getNewPosts() {
-        try {
-            dao.viewedPosts()
-        } catch (e: IOException) {
-            throw NetworkException
-        } catch (e: Exception) {
-            throw UnknownException
-        }
-    }
-
-    override suspend fun likeById(id: Long) {
-        try {
-            dao.likeById(id)
-            val response = apiService.likeById(id)
-            if (!response.isSuccessful) {
-                throw ApiException(response.code(), response.message())
-            }
-
-            val body = response.body() ?: throw ApiException(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
-        } catch (e: IOException) {
-            throw NetworkException
-        } catch (e: Exception) {
-            throw UnknownException
-        }
-    }
-
-    override suspend fun unlikeById(id: Long) {
-        try {
-            dao.likeById(id)
-            val response = apiService.unlikeById(id)
-            if (!response.isSuccessful) {
-                throw ApiException(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiException(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
-        } catch (e: IOException) {
-            throw NetworkException
-        } catch (e: Exception) {
-            throw UnknownException
-        }
-    }
-
-
-    override suspend fun save(post: Post) {
-        try {
-            val response = apiService.save(post)
-            if (!response.isSuccessful) {
-                throw ApiException(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiException(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
-        } catch (e: IOException) {
-            throw NetworkException
-        } catch (e: Exception) {
-            throw UnknownException
-        }
-    }
-
-    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
+    override suspend fun saveWithAttachment(
+        post: Post,
+        upload: MediaUpload,
+        type: AttachmentType,
+    ) {
         try {
             val media = uploadWithContent(upload)
             val postWithAttachment =
-                post.copy(attachment = Attachment(media.id, TypeAttachment.IMAGE))
-            save(postWithAttachment)
+                post.copy(attachment = Attachment(media.url, type))
+            savePost(postWithAttachment)
+        } catch (e: AppError) {
+            throw e
         } catch (e: IOException) {
-            throw NetworkException
+            throw NetworkError
         } catch (e: Exception) {
-            throw UnknownException
+            throw UnknownError()
         }
     }
 
     override suspend fun uploadWithContent(upload: MediaUpload): Media {
         try {
-            val media = MultipartBody.Part.createFormData("file",
-                upload.file.name,
-                upload.file.asRequestBody())
+            val media = MultipartBody.Part.createFormData(
+                "file",
+                "name",
+                upload.inputStream.readBytes()
+                    .toRequestBody("*/*".toMediaTypeOrNull())
+            )
 
-            val content = MultipartBody.Part.createFormData("content", "text")
-
-            val response = apiService.uploadPhoto(media, content)
+            val response = postApiService.uploadMedia(media)
             if (!response.isSuccessful) {
-                throw ApiException(response.code(), response.message())
+                throw ApiError(response.message())
             }
-            return response.body() ?: throw ApiException(response.code(), response.message())
+            return response.body() ?: throw ApiError(response.message())
         } catch (e: IOException) {
-            throw NetworkException
+            throw NetworkError
         } catch (e: Exception) {
-            throw UnknownException
+            throw UnknownError()
         }
     }
 
     override suspend fun removeById(id: Long) {
         try {
-            dao.removeById(id)
-            val response = apiService.removeById(id)
+            postDao.removeById(id)
+            val response = postApiService.removeById(id)
             if (!response.isSuccessful) {
-                throw ApiException(response.code(), response.message())
+                throw ApiError(response.message())
             }
-
         } catch (e: IOException) {
-            throw NetworkException
+            throw NetworkError
         } catch (e: Exception) {
-            throw UnknownException
+            throw UnknownError()
+        }
+    }
+
+    override suspend fun likeById(id: Long) {
+        try {
+            postDao.likeById(id)
+            val response = postApiService.likeById(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.message())
+
+            postDao.insertPost(PostEntity.fromDto(body))
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError()
+        }
+    }
+
+    override suspend fun unlikeById(id: Long) {
+        try {
+            postDao.unlikeById(id)
+            val response = postApiService.unlikeById(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.message())
+
+            postDao.insertPost(PostEntity.fromDto(body))
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError()
         }
     }
 }

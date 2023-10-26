@@ -6,31 +6,39 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import ru.netology.social_network.dto.User
-import ru.netology.social_network.model.FeedModelState
-import ru.netology.social_network.repository.AuthRepository
+import ru.netology.social_network.api.UserApiService
+import ru.netology.social_network.dto.Token
+import ru.netology.social_network.errors.ApiError
+import ru.netology.social_network.model.StateModel
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val userApiService: UserApiService,
 ) : ViewModel() {
 
-    private val _data = MutableLiveData<User>()
-    val data: LiveData<User>
-        get() = _data
+    val data = MutableLiveData<Token>()
 
-    private val _state = MutableLiveData<FeedModelState>()
-    val state: LiveData<FeedModelState>
-        get() = _state
+    private val _dataState = MutableLiveData<StateModel>()
+    val dataState: LiveData<StateModel>
+        get() = _dataState
 
-    fun loginAttempt(login: String?, password: String?) {
+    fun authorizationUser(login: String, password: String) {
         viewModelScope.launch {
+            _dataState.postValue(StateModel(loading = true))
             try {
-                val user = authRepository.authUser(login, password)
-                _data.value = user
+                val response = userApiService.updateUser(login, password)
+                if (!response.isSuccessful) {
+                    throw ApiError(response.message())
+                }
+                _dataState.postValue(StateModel())
+                val body = response.body() ?: throw ApiError(response.message())
+                data.value = Token(body.id, body.token)
+            } catch (e: IOException) {
+                _dataState.postValue(StateModel(error = true))
             } catch (e: Exception) {
-                _state.postValue(FeedModelState(loginError = true))
+                _dataState.postValue(StateModel(loginError = true))
             }
         }
     }

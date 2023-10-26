@@ -1,6 +1,8 @@
 package ru.netology.social_network.dto
 
-class User(
+data class User(
     val id: Long,
-    val token: String,
+    val login: String,
+    val name: String,
+    val avatar: String? = null,
 )

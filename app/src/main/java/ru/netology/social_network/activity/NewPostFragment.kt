@@ -1,23 +1,25 @@
 package ru.netology.social_network.activity
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toFile
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.social_network.R
-import ru.netology.social_network.until.AndroidUtils
-import ru.netology.social_network.until.StringArg
+import ru.netology.social_network.untils.AndroidUtils
+import ru.netology.social_network.untils.StringArg
 import ru.netology.social_network.viewmodel.PostViewModel
 import ru.netology.social_network.databinding.FragmentNewPostBinding
+import ru.netology.social_network.enumeration.AttachmentType
+
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class NewPostFragment : Fragment() {
@@ -25,10 +27,12 @@ class NewPostFragment : Fragment() {
     companion object {
         var Bundle.textArg: String? by StringArg
     }
-    private var fragmentBinding: FragmentNewPostBinding? = null
 
-    private val viewModel: PostViewModel by viewModels()
+    var type: AttachmentType? = null
 
+    private val postViewModel by activityViewModels<PostViewModel>()
+
+    private var fragmentNewPostBinding: FragmentNewPostBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,54 +44,73 @@ class NewPostFragment : Fragment() {
             container,
             false
         )
-        fragmentBinding = binding
 
-        arguments?.textArg.let(binding.content::setText)
+        (activity as AppCompatActivity).supportActionBar?.title =
+            context?.getString(R.string.title_post)
+
+        fragmentNewPostBinding = binding
+
+        arguments?.textArg
+            ?.let(binding.editTextFragmentNewPost::setText) ?: postViewModel.edited.value?.content
+
+        binding.editTextFragmentNewPost.requestFocus()
 
         val photoLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                when (it.resultCode) {
-                    ImagePicker.RESULT_ERROR -> {
-                        Toast.makeText(requireContext(), "Image pick Error", Toast.LENGTH_SHORT)
-                            .show()
+                it.data?.data.let { uri ->
+                    val stream = uri?.let {
+                        context?.contentResolver?.openInputStream(it)
                     }
-                    else -> {
-                        val uri: Uri? = it.data?.data
-                        viewModel.changePhoto(uri, uri?.toFile())
-                    }
+                    postViewModel.changeMedia(uri, stream, type)
                 }
             }
 
-        binding.pickPhoto.setOnClickListener {
-            ImagePicker.Builder(this)
-                .cameraOnly()
-                .maxResultSize(2048, 2048)
-                .createIntent(photoLauncher::launch)
-        }
-
-        binding.takePhoto.setOnClickListener {
-            ImagePicker.Builder(this)
-                .cameraOnly()
-                .maxResultSize(2048, 2048)
-                .createIntent(photoLauncher::launch)
-        }
-
-        binding.deletePhoto.setOnClickListener {
-            viewModel.changePhoto(null, null)
-        }
-
-
-        viewModel.postCreated.observe(viewLifecycleOwner) {
-            findNavController().navigateUp()
-        }
-        viewModel.photo.observe(viewLifecycleOwner) {
-            if (it?.uri == null) {
-                binding.photoLayout.visibility = View.GONE
-                return@observe
+        val mediaLauncher =
+            registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+                uri?.let {
+                    val stream = context?.contentResolver?.openInputStream(it)
+                    postViewModel.changeMedia(it, stream, type)
+                }
             }
 
-            binding.photoLayout.visibility = View.VISIBLE
-            binding.photo.setImageURI(it.uri)
+        binding.imageViewTakePhotoFragmentNewPost.setOnClickListener {
+            ImagePicker.Builder(this)
+                .cameraOnly()
+                .maxResultSize(2048, 2048)
+                .createIntent(photoLauncher::launch)
+            type = AttachmentType.IMAGE
+        }
+
+        binding.imageViewPickPhotoFragmentNewPost.setOnClickListener {
+            mediaLauncher.launch("image/*")
+            type = AttachmentType.IMAGE
+        }
+
+        binding.imageViewPickAudioFragmentNewPost.setOnClickListener {
+            mediaLauncher.launch("audio/*")
+            type = AttachmentType.AUDIO
+        }
+
+        binding.imageViewPickVideoFragmentNewPost.setOnClickListener {
+            mediaLauncher.launch("video/*")
+            type = AttachmentType.VIDEO
+        }
+
+        binding.buttonRemovePhotoFragmentNewPost.setOnClickListener {
+            postViewModel.changeMedia(null, null, null)
+        }
+
+        postViewModel.media.observe(viewLifecycleOwner) {
+            if (it?.uri == null) {
+                binding.frameLayoutMediaFragmentNewPost.visibility = View.GONE
+                return@observe
+            }
+            binding.frameLayoutMediaFragmentNewPost.visibility = View.VISIBLE
+            binding.imageViewPhotoFragmentNewPost.setImageURI(it.uri)
+        }
+
+        postViewModel.postCreated.observe(viewLifecycleOwner) {
+            findNavController().navigate(R.id.nav_posts)
         }
 
         requireActivity().addMenuProvider(object : MenuProvider {
@@ -98,20 +121,43 @@ class NewPostFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                 when (menuItem.itemId) {
                     R.id.save -> {
-                        viewModel.changeContent(binding.content.text.toString())
-                        viewModel.save()
-                        AndroidUtils.hideKeyboard(requireView())
+                        fragmentNewPostBinding?.let {
+                            if (it.editTextFragmentNewPost.text.isNullOrBlank()) {
+                                Toast.makeText(
+                                    activity,
+                                    R.string.error_empty_content,
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            } else {
+                                postViewModel.changeContent(
+                                    binding.editTextFragmentNewPost.text.toString()
+                                )
+                                postViewModel.save()
+                                AndroidUtils.hideKeyboard(requireView())
+                            }
+                        }
                         true
                     }
                     else -> false
                 }
         }, viewLifecycleOwner)
-        binding.content.requestFocus()
+
+        postViewModel.dataState.observe(viewLifecycleOwner) {
+            when {
+                it.error -> {
+                    Toast.makeText(context, R.string.error_loading, Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+            binding.progressBarFragmentNewPost.isVisible = it.loading
+        }
 
         return binding.root
     }
+
     override fun onDestroyView() {
-        fragmentBinding = null
+        fragmentNewPostBinding = null
         super.onDestroyView()
     }
 }
