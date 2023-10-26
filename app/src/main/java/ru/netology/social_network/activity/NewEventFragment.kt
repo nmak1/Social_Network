@@ -140,6 +140,7 @@ class NewEventFragment : Fragment() {
 
         binding.imageViewPickPhotoFragmentNewEvent.setOnClickListener {
 
+            ImagePicker.Builder(this)
                 .galleryOnly()
                 .galleryMimeTypes(
                     arrayOf(

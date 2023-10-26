@@ -4,6 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.kapt'
     id 'com.google.gms.google-services'
     id 'dagger.hilt.android.plugin'
+
 }
 
 android {
