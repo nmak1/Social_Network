@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">NeWorkApp</string>
+    <string name="app_name">Social_Network</string>
     <string name="title_profile">Profile</string>
     <string name="title_posts">Posts</string>
     <string name="title_users">Users</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Хочу работу!!!</string>
+    <string name="app_name">Соц сеть</string>
     <string name="title_profile">Профиль</string>
     <string name="title_posts">Посты</string>
     <string name="title_users">Пользователи</string>
