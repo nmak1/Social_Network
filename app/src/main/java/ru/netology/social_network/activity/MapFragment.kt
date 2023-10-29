@@ -5,7 +5,10 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -25,7 +28,10 @@ import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.user_location.UserLocationLayer
 import com.yandex.runtime.ui_view.ViewProvider
+import ru.netology.social_network.BuildConfig.MAPS_API_KEY
 import ru.netology.social_network.R
+import ru.netology.social_network.adapter.MapAdapter
+import ru.netology.social_network.model.MapModel
 
 class MapFragment : Fragment(), LocationListener, InputListener {
 
@@ -36,6 +42,9 @@ class MapFragment : Fragment(), LocationListener, InputListener {
 
     private var position: Point? = null
     private var open: String? = null
+    lateinit var listview: ListView
+    var list = mutableListOf<MapModel>()
+    lateinit var adapter: MapAdapter
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -52,7 +61,10 @@ class MapFragment : Fragment(), LocationListener, InputListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MapKitFactory.setApiKey(MAPS_API_KEY)
         MapKitFactory.initialize(requireContext())
+
+
     }
 
     override fun onCreateView(
@@ -85,7 +97,7 @@ class MapFragment : Fragment(), LocationListener, InputListener {
         open = arguments?.getString("open")
         position =
             if (open == "newEvent") {
-                Point(54.987780, 73.395903)
+                Point(56.319504, 44.013038)
             } else Point(lat!!, long!!)
 
         if (lat != null && long != null)
