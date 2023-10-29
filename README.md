@@ -48,7 +48,7 @@
     - Просмотр списка отмеченных пользователей
     - Возможность делиться в других приложениях
 
-![Image alt text](https://github.com/nmak1/Social_Network/blob/master/screenShots/%D0%BF%D0%BE%D1%81%D1%82%D1%8B.png)
+
 ![Image alt text](https://github.com/nmak1/Social_Network/blob/master/screenShots/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202023-10-28%20145146.png)
 ![Image alt text](https://github.com/nmak1/Social_Network/blob/master/screenShots/2.png)
 
@@ -72,7 +72,7 @@
     - Возможность делиться в других приложениях
     - Просмотр списка спикеров
     - Определение места проведения события через Яндекс.Карты 
-
+![Image alt text](https://github.com/nmak1/Social_Network/blob/master/screenShots/%D0%BF%D0%BE%D1%81%D1%82%D1%8B.png)
 ---
 
 - **Страница профиля пользователя**
