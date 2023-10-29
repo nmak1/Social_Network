@@ -29,6 +29,7 @@
 
 Здесь пользователи могут создать новую учетную запись, указав имя, будующий логин и пароль для входа,
 или ввести свои логин и пароль для входа в аккаунт.
+![Image alt text](https://github.com/nmak1/Social_Network/blob/master/screenShots/1.png)
 ![Image alt text](https://github.com/nmak1/Social_Network/blob/master/screenShots/2.png)
 ![Image alt text](https://github.com/nmak1/Social_Network/blob/master/screenShots/3.png)
 ![Image alt text](https://github.com/nmak1/Social_Network/blob/master/screenShots/4.png)
@@ -73,7 +74,6 @@
     - Просмотр списка спикеров
     - Определение места проведения события через Яндекс.Карты 
 
-![Image alt text](https://github.com/nmak1/Social_Network/blob/master/screenShots/1.png)
 ---
 
 - **Страница профиля пользователя**
