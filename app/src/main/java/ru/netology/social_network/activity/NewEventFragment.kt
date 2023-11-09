@@ -1,12 +1,10 @@
 package ru.netology.social_network.activity
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -42,8 +40,7 @@ class NewEventFragment : Fragment() {
     private var longitude: Double? = null
 
     @SuppressLint("SetTextI18n")
-    )
-    override fun onCreateView(
+        override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -183,7 +180,6 @@ class NewEventFragment : Fragment() {
                 menuInflater.inflate(R.menu.create_post_menu, menu)
             }
 
-            )
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                 when (menuItem.itemId) {
                     R.id.save -> {

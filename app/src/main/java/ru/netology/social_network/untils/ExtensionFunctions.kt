@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
-import android.os.Build
 import android.widget.EditText
-import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -15,7 +13,6 @@ import java.util.*
 
 private val calendar = Calendar.getInstance()
 
-)
 fun formatToDate(value: String?): String {
     val transformation = DateTimeFormatter
         .ofLocalizedDateTime(FormatStyle.SHORT)
@@ -32,7 +29,6 @@ fun epochSecToDate(second: Long): String {
     return simpleDateFormat.format(date)
 }
 
-)
 fun dateToEpochSec(string: String?): Long? {
     return if (string.isNullOrBlank()) null else LocalDate.parse(string)
         .atStartOfDay(ZoneId.of("Europe/Moscow")).toEpochSecond()
@@ -81,7 +77,6 @@ fun pickTime(editText: EditText, context: Context) {
         .show()
 }
 
-)
 fun formatToInstant(value: String): String {
     return if (value != " ") {
         val datetime = SimpleDateFormat(

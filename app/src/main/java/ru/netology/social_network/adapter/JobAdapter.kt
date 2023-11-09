@@ -1,12 +1,11 @@
 package ru.netology.social_network.adapter
 
 import android.content.Context
-import android.os.Build
 import android.view.LayoutInflater
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -34,7 +33,6 @@ class JobAdapter(
         return JobViewHolder(parent.context, binding, onJobInteractionListener)
     }
 
-    )
     override fun onBindViewHolder(holder: JobViewHolder, position: Int) {
         getItem(position)?.let {
             holder.bind(it)
@@ -48,7 +46,6 @@ class JobViewHolder(
     private val onJobInteractionListener: OnJobInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    )
     fun bind(job: Job) {
 
         binding.apply {

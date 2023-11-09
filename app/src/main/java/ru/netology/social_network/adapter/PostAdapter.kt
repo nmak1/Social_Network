@@ -2,13 +2,15 @@ package ru.netology.social_network.adapter
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.os.Build
 import android.view.LayoutInflater
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.INVISIBLE
+import android.view.View.SCALE_X
+import android.view.View.SCALE_Y
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.BounceInterpolator
 import android.widget.PopupMenu
-import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -17,7 +19,9 @@ import com.bumptech.glide.Glide
 import ru.netology.social_network.R
 import ru.netology.social_network.databinding.CardPostBinding
 import ru.netology.social_network.dto.Post
-import ru.netology.social_network.enumeration.AttachmentType.*
+import ru.netology.social_network.enumeration.AttachmentType.AUDIO
+import ru.netology.social_network.enumeration.AttachmentType.IMAGE
+import ru.netology.social_network.enumeration.AttachmentType.VIDEO
 import ru.netology.social_network.untils.formatToDate
 
 interface OnPostInteractionListener {
@@ -47,7 +51,6 @@ class PostsAdapter(
         return PostViewHolder(binding, onPostInteractionListener)
     }
 
-    )
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         getItem(position)?.let {
             holder.bind(it)
@@ -60,7 +63,6 @@ class PostViewHolder(
     private val onPostInteractionListener: OnPostInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    )
     fun bind(post: Post) {
 
         binding.apply {

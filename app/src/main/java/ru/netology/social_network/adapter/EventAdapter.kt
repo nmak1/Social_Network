@@ -2,13 +2,14 @@ package ru.netology.social_network.adapter
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.os.Build
 import android.view.LayoutInflater
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.SCALE_X
+import android.view.View.SCALE_Y
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.BounceInterpolator
 import android.widget.PopupMenu
-import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -48,7 +49,6 @@ class EventAdapter(
         return EventViewHolder(binding, onEventInteractionListener)
     }
 
-    )
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         getItem(position)?.let {
             holder.bind(it)
@@ -61,7 +61,6 @@ class EventViewHolder(
     private val onEventInteractionListener: OnEventInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    )
     fun bind(event: Event) {
 
         binding.apply {

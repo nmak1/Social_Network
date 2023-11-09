@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -19,8 +17,6 @@ object AndroidUtils {
         val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
-
-    )
     fun convertDateAndTime(dateAndTime: String): String {
         return if (dateAndTime == "") {
             ""
@@ -30,7 +26,6 @@ object AndroidUtils {
         }
     }
 
-    )
     fun convertDate(date: String): String {
         return if (date == "") {
             ""
@@ -47,7 +42,7 @@ object AndroidUtils {
         val startMonth = currentDateTime.get(Calendar.MONTH)
         val startDay = currentDateTime.get(Calendar.DAY_OF_MONTH)
 
-        DatePickerDialog(context, DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+        DatePickerDialog(context,  { _, year, month, dayOfMonth ->
             val pickedDateTime = Calendar.getInstance()
             pickedDateTime.set(year, month, dayOfMonth)
             val result = GregorianCalendar(year, month, dayOfMonth).time
@@ -64,8 +59,8 @@ object AndroidUtils {
         val startHour = currentDateTime.get(Calendar.HOUR_OF_DAY)
         val startMinute = currentDateTime.get(Calendar.MINUTE)
 
-        DatePickerDialog(context, DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-            TimePickerDialog(context, TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
+        DatePickerDialog(context,  { _, year, month, dayOfMonth ->
+            TimePickerDialog(context, { _, hourOfDay, minute ->
                 val pickedDateTime = Calendar.getInstance()
                 pickedDateTime.set(year, month, dayOfMonth, hourOfDay, minute)
                 val result = GregorianCalendar(year, month, dayOfMonth, hourOfDay, minute).time
