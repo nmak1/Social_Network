@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -46,7 +45,6 @@ class MapFragment : Fragment(), LocationListener, InputListener {
 
     private var position: Point? = null
     private var open: String? = null
-    private var listview: ListView? = null
     var list = mutableListOf<MapModel>()
     lateinit var adapter: MapAdapter
 
