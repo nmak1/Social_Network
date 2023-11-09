@@ -14,10 +14,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import com.yandex.mapkit.MapKitFactory.getInstance
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.LocationServices
+import com.yandex.mapkit.MapKit
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.location.LocationManager
@@ -35,18 +35,18 @@ import ru.netology.social_network.databinding.FragmentMapBinding
 import ru.netology.social_network.model.MapModel
 
 
-
+@Suppress("DEPRECATION")
 class MapFragment : Fragment(), LocationListener, InputListener {
 
-     private var mapView:MapView?=null
-     private var userLocationLayer: UserLocationLayer?=null
-     private var marksObject: MapObjectCollection?=null
-     private var locationManager: LocationManager?=null
-    private var _binding:FragmentMapBinding?=null
+    private var mapView: MapView? = null
+    private var userLocationLayer: UserLocationLayer? = null
+    private var marksObject: MapObjectCollection? = null
+    private var locationManager: LocationManager? = null
+    private var _binding: FragmentMapBinding? = null
 
     private var position: Point? = null
     private var open: String? = null
-    lateinit var listview: ListView
+    private var listview: ListView? = null
     var list = mutableListOf<MapModel>()
     lateinit var adapter: MapAdapter
 
@@ -62,6 +62,7 @@ class MapFragment : Fragment(), LocationListener, InputListener {
                     .show()
             }
         }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MapKitFactory.setApiKey(MAPS_API_KEY)
@@ -71,20 +72,20 @@ class MapFragment : Fragment(), LocationListener, InputListener {
     }
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_map, null)
+        val view = inflater.inflate(R.layout.fragment_map,container,false)
 
         (activity as AppCompatActivity).supportActionBar?.title =
             context?.getString(R.string.title_map)
 
         mapView = view.findViewById(R.id.mapview_map)
-        userLocationLayer = getInstance().createUserLocationLayer(mapView?.mapWindow!!)
-        locationManager = getInstance().createLocationManager()
+        val mapKit: MapKit = MapKitFactory.getInstance()
+        userLocationLayer = mapKit.createUserLocationLayer(mapView?.mapWindow!!)
+        locationManager = mapKit.createLocationManager()
         marksObject = mapView?.map?.mapObjects?.addCollection()
         mapView?.map?.addInputListener(this)
 
@@ -114,6 +115,7 @@ class MapFragment : Fragment(), LocationListener, InputListener {
 
         return view
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -153,6 +155,7 @@ class MapFragment : Fragment(), LocationListener, InputListener {
                     println(it)
                 }
             }
+
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
