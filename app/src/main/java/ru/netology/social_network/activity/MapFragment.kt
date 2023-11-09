@@ -14,11 +14,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import com.yandex.mapkit.MapKitFactory.getInstance
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.MapKitFactory
-import com.yandex.mapkit.MapKitFactory.getInstance
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.location.LocationManager
 import com.yandex.mapkit.map.CameraPosition
@@ -31,14 +31,18 @@ import com.yandex.runtime.ui_view.ViewProvider
 import ru.netology.social_network.BuildConfig.MAPS_API_KEY
 import ru.netology.social_network.R
 import ru.netology.social_network.adapter.MapAdapter
+import ru.netology.social_network.databinding.FragmentMapBinding
 import ru.netology.social_network.model.MapModel
+
+
 
 class MapFragment : Fragment(), LocationListener, InputListener {
 
-    private lateinit var mapView: MapView
-    private lateinit var userLocationLayer: UserLocationLayer
-    private lateinit var marksObject: MapObjectCollection
-    private lateinit var locationManager: LocationManager
+     private var mapView:MapView?=null
+     private var userLocationLayer: UserLocationLayer?=null
+     private var marksObject: MapObjectCollection?=null
+     private var locationManager: LocationManager?=null
+    private var _binding:FragmentMapBinding?=null
 
     private var position: Point? = null
     private var open: String? = null
@@ -50,15 +54,14 @@ class MapFragment : Fragment(), LocationListener, InputListener {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 mapView.apply {
-                    userLocationLayer.isVisible = true
-                    userLocationLayer.isHeadingEnabled = false
+                    userLocationLayer?.isVisible = true
+                    userLocationLayer?.isHeadingEnabled = false
                 }
             } else {
                 Toast.makeText(context, R.string.no_location, Toast.LENGTH_LONG)
                     .show()
             }
         }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MapKitFactory.setApiKey(MAPS_API_KEY)
@@ -67,25 +70,27 @@ class MapFragment : Fragment(), LocationListener, InputListener {
 
     }
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_map, container, false)
+        val view = inflater.inflate(R.layout.fragment_map, null)
 
         (activity as AppCompatActivity).supportActionBar?.title =
             context?.getString(R.string.title_map)
 
         mapView = view.findViewById(R.id.mapview_map)
-        userLocationLayer = getInstance().createUserLocationLayer(mapView.mapWindow)
+        userLocationLayer = getInstance().createUserLocationLayer(mapView?.mapWindow!!)
         locationManager = getInstance().createLocationManager()
-        marksObject = mapView.map.mapObjects.addCollection()
-        mapView.map.addInputListener(this)
+        marksObject = mapView?.map?.mapObjects?.addCollection()
+        mapView?.map?.addInputListener(this)
 
         view.findViewById<View>(R.id.button_location).setOnClickListener {
             try {
-                moveCamera(userLocationLayer.cameraPosition()?.target!!)
+                moveCamera(userLocationLayer!!.cameraPosition()?.target!!)
             } catch (e: Exception) {
                 Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                     .show()
@@ -109,9 +114,13 @@ class MapFragment : Fragment(), LocationListener, InputListener {
 
         return view
     }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     private fun moveCamera(point: Point) {
-        mapView.map.move(CameraPosition(point, 10F, 0F, 0F))
+        mapView?.map?.move(CameraPosition(point, 10F, 0F, 0F))
     }
 
     private fun addMarker(point: Point) {
@@ -119,7 +128,7 @@ class MapFragment : Fragment(), LocationListener, InputListener {
             background = AppCompatResources
                 .getDrawable(context, R.drawable.ic_baseline_place_24)
         }
-        mapView.map.mapObjects.addPlacemark(
+        mapView?.map?.mapObjects?.addPlacemark(
             point,
             ViewProvider(marker)
         )
@@ -133,8 +142,8 @@ class MapFragment : Fragment(), LocationListener, InputListener {
             ),
             -> {
                 mapView.apply {
-                    userLocationLayer.isVisible = true
-                    userLocationLayer.isHeadingEnabled = false
+                    userLocationLayer?.isVisible = true
+                    userLocationLayer?.isHeadingEnabled = false
                 }
 
                 val fusedLocationProviderClient = LocationServices
@@ -152,22 +161,22 @@ class MapFragment : Fragment(), LocationListener, InputListener {
 
     override fun onStart() {
         super.onStart()
-        mapView.onStart()
-        getInstance().onStart()
+        mapView?.onStart()
+        onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView.onStop()
-        getInstance().onStop()
+        mapView?.onStop()
+        onStop()
     }
 
     override fun onMapTap(map: Map, point: Point) {
-        mapView.map.deselectGeoObject()
+        mapView?.map?.deselectGeoObject()
     }
 
     override fun onMapLongTap(map: Map, point: Point) {
-        mapView.map.mapObjects.clear()
+        mapView?.map?.mapObjects?.clear()
         view?.findViewById<View>(R.id.button_set_point)?.visibility = View.VISIBLE
         addMarker(point)
 

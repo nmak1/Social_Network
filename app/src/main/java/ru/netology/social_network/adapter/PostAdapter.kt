@@ -47,7 +47,7 @@ class PostsAdapter(
         return PostViewHolder(binding, onPostInteractionListener)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    )
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         getItem(position)?.let {
             holder.bind(it)
@@ -60,7 +60,7 @@ class PostViewHolder(
     private val onPostInteractionListener: OnPostInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    )
     fun bind(post: Post) {
 
         binding.apply {

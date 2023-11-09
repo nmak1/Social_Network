@@ -48,8 +48,9 @@ android {
 
 }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -73,7 +74,7 @@ dependencies {
     def lifecycle_version = "2.6.2"
     def mdc_version = '1.10.0'
     def nav_version = '2.5.3'
-    def room_version = '2.5.0'
+    def room_version = '2.6.0'
     def firebase_version = '32.4.0'
     def glide_version = "4.16.0"
     def retrofit_version = "2.9.0"
@@ -108,6 +109,7 @@ dependencies {
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     kapt "androidx.room:room-compiler:$room_version"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
 
     implementation "com.google.android.material:material:$mdc_version"
     implementation "com.google.firebase:firebase-messaging-ktx"

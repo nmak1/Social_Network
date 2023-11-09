@@ -48,7 +48,7 @@ class EventAdapter(
         return EventViewHolder(binding, onEventInteractionListener)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    )
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         getItem(position)?.let {
             holder.bind(it)
@@ -61,7 +61,7 @@ class EventViewHolder(
     private val onEventInteractionListener: OnEventInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    )
     fun bind(event: Event) {
 
         binding.apply {

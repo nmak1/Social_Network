@@ -41,7 +41,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
                     putString("avatar", user.avatar)
                 }
                 findNavController().apply {
-//                    this.popBackStack(R.id.navigation_main, true)
                     this.navigate(R.id.nav_profile, bundle)
                 }
             }
@@ -52,7 +51,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
         userViewModel.data.observe(viewLifecycleOwner) {
             adapter.submitList(it.filter { user ->
-                userViewModel.userIds.value!!.contains(user.id)
+                userViewModel.userIds.value?.contains(user.id)!!
             })
         }
 

@@ -20,7 +20,7 @@ object AndroidUtils {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    )
     fun convertDateAndTime(dateAndTime: String): String {
         return if (dateAndTime == "") {
             ""
@@ -30,7 +30,7 @@ object AndroidUtils {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    )
     fun convertDate(date: String): String {
         return if (date == "") {
             ""

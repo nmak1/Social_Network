@@ -15,7 +15,7 @@ import java.util.*
 
 private val calendar = Calendar.getInstance()
 
-@RequiresApi(Build.VERSION_CODES.O)
+)
 fun formatToDate(value: String?): String {
     val transformation = DateTimeFormatter
         .ofLocalizedDateTime(FormatStyle.SHORT)
@@ -32,7 +32,7 @@ fun epochSecToDate(second: Long): String {
     return simpleDateFormat.format(date)
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+)
 fun dateToEpochSec(string: String?): Long? {
     return if (string.isNullOrBlank()) null else LocalDate.parse(string)
         .atStartOfDay(ZoneId.of("Europe/Moscow")).toEpochSecond()
@@ -81,7 +81,7 @@ fun pickTime(editText: EditText, context: Context) {
         .show()
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+)
 fun formatToInstant(value: String): String {
     return if (value != " ") {
         val datetime = SimpleDateFormat(

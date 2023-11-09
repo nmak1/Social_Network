@@ -34,7 +34,7 @@ class JobAdapter(
         return JobViewHolder(parent.context, binding, onJobInteractionListener)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    )
     override fun onBindViewHolder(holder: JobViewHolder, position: Int) {
         getItem(position)?.let {
             holder.bind(it)
@@ -48,7 +48,7 @@ class JobViewHolder(
     private val onJobInteractionListener: OnJobInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    )
     fun bind(job: Job) {
 
         binding.apply {

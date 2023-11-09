@@ -42,7 +42,7 @@ class NewEventFragment : Fragment() {
     private var longitude: Double? = null
 
     @SuppressLint("SetTextI18n")
-    @RequiresApi(Build.VERSION_CODES.O)
+    )
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -183,7 +183,7 @@ class NewEventFragment : Fragment() {
                 menuInflater.inflate(R.menu.create_post_menu, menu)
             }
 
-            @RequiresApi(Build.VERSION_CODES.O)
+            )
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                 when (menuItem.itemId) {
                     R.id.save -> {

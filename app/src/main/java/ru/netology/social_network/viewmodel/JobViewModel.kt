@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.social_network.auth.AppAuth
 import ru.netology.social_network.dto.Job
-import ru.netology.social_network.model.JobModel
 import ru.netology.social_network.model.StateModel
 import ru.netology.social_network.repository.JobRepository
 import ru.netology.social_network.untils.SingleLiveEvent
@@ -36,7 +35,6 @@ class JobViewModel @Inject constructor(
         appAuth.authStateFlow
             .flatMapLatest { (myId, _) ->
                 jobRepository.data.map {
-                    JobModel()
                     it.map { job ->
                         job.copy(
                             ownedByMe = userId.value == myId
